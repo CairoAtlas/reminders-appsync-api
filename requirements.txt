@@ -1,1 +1,3 @@
-awscli
+pytest
+pytest-env
+moto
