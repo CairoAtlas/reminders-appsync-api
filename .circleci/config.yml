@@ -35,9 +35,9 @@ jobs:
       - run:
           name: install serverless and plugins
           command: |
-            npm install -g serverless
-            npm install serverless-pseudo-parameters
-            npm install serverless-appsync-plugin
+            sudo npm install -g serverless
+            npm install --save serverless-pseudo-parameters
+            npm install --save serverless-appsync-plugin
 
       - run:
           name: configure aws
