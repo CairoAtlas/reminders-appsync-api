@@ -1,0 +1,44 @@
+type Query {
+	getReminder(
+		title: String!
+		createdTimestamp: Int!
+	): Reminder!
+
+	getRemindersByTitle(
+		title: String!
+	): [Reminder]!
+
+	getReminders: [Reminder]!
+}
+
+type Mutation {
+	createReminder(
+		title: String!
+		createdDatetime: Int!
+		notes: String
+		dueTimestamp: Int
+		location: String
+		remindTimestamp: Int
+		priority: Int
+	): Reminder!
+
+	deleteReminder(
+		title: String!
+		createdTimestamp: Int!
+	): Reminder!
+}
+
+type Reminder {
+	title: String!
+	createdDatetime: Int!
+	notes: String
+	dueTimestamp: Int
+	location: String
+	remindTimestamp: Int
+	priority: Int
+}
+
+schema {
+	query: Query
+	mutation: Mutation
+}

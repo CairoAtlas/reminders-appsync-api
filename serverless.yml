@@ -1,0 +1,95 @@
+service: reminders
+
+provider:
+  name: aws
+  runtime: python3.7
+
+plugins:
+  - serverless-pseudo-parameters
+  - serverless-appsync-plugin
+
+custom:
+  appSync:
+    name: reminders
+    authenticationType: API_KEY
+    schema: appsync/schema.graphql
+    mappingTemplatesLocation: appsync/mapping-templates
+    mappingTemplates:
+      - dataSource: Reminders
+        type: Query
+        field: getReminder
+        request: getReminder-request-mapping-template.vtl
+        response: passthrough-response-mapping-template.vtl
+      - dataSource: Reminders
+        type: Query
+        field: getReminders
+        request: getReminders-request-mapping-template.vtl
+        response: passthrough-response-mapping-template.vtl
+      - dataSource: Reminders
+        type: Mutation
+        field: deleteReminder
+        request: deleteReminder-request-mapping-template.vtl
+        response: passthrough-response-mapping-template.vtl
+      - dataSource: Reminders
+        type: Mutation
+        field: createReminder
+        request: createReminder-request-mapping-template.vtl
+        response: passthrough-response-mapping-template.vtl
+
+    dataSources:
+      - type: AMAZON_DYNAMODB
+        name: Reminders
+        description: Reminders Dynamo Table
+        config:
+          tableName: ${self:service}-${opt:stage}-table
+          serviceRole: RemindersAppSyncDynamoDBServiceRole
+
+resources:
+  Resources:
+    RemindersAppSyncDynamoDBServiceRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: reminders-appsync-dynamo-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Principal:
+                Service:
+                  - "appsync.amazonaws.com"
+              Action:
+                - "sts:AssumeRole"
+        Policies:
+          - PolicyName: reminders-appsync-dynamo-policy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: "Allow"
+                  Action:
+                    - "dynamodb:Query"
+                    - "dynamodb:BatchWriteItem"
+                    - "dynamodb:GetItem"
+                    - "dynamodb:DeleteItem"
+                    - "dynamodb:PutItem"
+                    - "dynamodb:Scan"
+                    - "dynamodb:UpdateItem"
+                  Resource:
+                    Fn::GetAtt: [RemindersDynamoDBTable, Arn]
+    RemindersDynamoDBTable:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: title
+            AttributeType: S
+          - AttributeName: createdTimestamp
+            AttributeType: N
+        KeySchema:
+          - AttributeName: title
+            KeyType: HASH
+          - AttributeName: createdTimestamp
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        TableName: ${self:service}-${opt:stage}-table

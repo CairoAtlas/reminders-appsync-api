@@ -1,0 +1,9 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "DeleteItem",
+    "key" : {
+        "title" : { "S" : "${context.arguments.title}" },
+        "createdTimestamp" : { "S" : "${context.arguments.createdTimestamp}" }
+    },
+    "consistentRead" : true
+}

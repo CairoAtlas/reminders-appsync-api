@@ -1,0 +1,17 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "PutItem",
+    "key": {
+        "title" : { "S" : "${context.arguments.title}" },
+        "createdTimestamp" : { "N" : "${context.arguments.createdTimestamp}" }
+    },
+    "attributeValues" : {
+        "title"    : { "S" : "${context.arguments.title}" },
+        "createdTimestamp" : { "N" : ${context.arguments.createdTimestamp} }
+        "notes" : { "S" : "${context.arguments.notes}" }
+        "dueTimestamp" : { "N" : "${context.arguments.dueTimestamp}" }
+        "location" : { "S" : "${context.arguments.location}" }
+        "remindTimestamp" : { "N" : "${context.arguments.remindTimestamp}" }
+        "priority" : { "N" : "${context.arguments.priority}" }
+    }
+}
