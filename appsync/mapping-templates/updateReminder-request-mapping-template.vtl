@@ -13,13 +13,9 @@
     #set( $expAdd = {} )
     #set( $expRemove = [] )
 
-    ## Increment "version" by 1 **
-    $!{expAdd.put("version", ":one")}
-    $!{expValues.put(":one", { "N" : 1 })}
-
-    ## Iterate through each argument, skipping "id" and "expectedVersion" **
+    ## Iterate through each argument, skipping "title" and "createdTimestamp" **
     #foreach( $entry in $context.arguments.entrySet() )
-        #if( $entry.key != "id" && $entry.key != "expectedVersion" )
+        #if( $entry.key != "title" && $entry.key != "createdTimestamp" )
             #if( (!$entry.value) && ("$!{entry.value}" == "") )
                 ## If the argument is set to "null", then remove that attribute from the item in DynamoDB **
 
@@ -47,17 +43,6 @@
         #end
     #end
 
-    ## Continue building the update expression, adding attributes you're going to ADD **
-    #if( !${expAdd.isEmpty()} )
-        #set( $expression = "${expression} ADD" )
-        #foreach( $entry in $expAdd.entrySet() )
-            #set( $expression = "${expression} ${entry.key} ${entry.value}" )
-            #if ( $foreach.hasNext )
-                #set( $expression = "${expression}," )
-            #end
-        #end
-    #end
-
     ## Continue building the update expression, adding attributes you're going to REMOVE **
     #if( !${expRemove.isEmpty()} )
         #set( $expression = "${expression} REMOVE" )
@@ -79,12 +64,5 @@
         #if( !${expValues.isEmpty()} )
             ,"expressionValues" : $utils.toJson($expValues)
         #end
-    },
-
-    "condition" : {
-        "expression"       : "version = :expectedVersion",
-        "expressionValues" : {
-            ":expectedVersion" : { "N" : ${context.arguments.expectedVersion} }
-        }
     }
 }
