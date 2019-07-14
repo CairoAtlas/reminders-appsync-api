@@ -14,7 +14,7 @@ type Query {
 type Mutation {
 	createReminder(
 		title: String!
-		createdDatetime: Int!
+		createdTimestamp: Int!
 		notes: String
 		dueTimestamp: Int
 		location: String
