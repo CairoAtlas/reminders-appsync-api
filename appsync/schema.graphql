@@ -2,7 +2,7 @@ type Query {
 	getReminder(
 		title: String!
 		createdTimestamp: Int!
-	): Reminder!
+	): Reminder
 
 	getRemindersByTitle(
 		title: String!

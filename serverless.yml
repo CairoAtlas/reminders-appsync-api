@@ -19,7 +19,7 @@ custom:
         type: Query
         field: getReminder
         request: getReminder-request-mapping-template.vtl
-        response: passthrough-response-mapping-template.vtl
+        response: single-object-response-mapping-template.vtl
       - dataSource: Reminders
         type: Query
         field: getReminders
@@ -44,7 +44,7 @@ custom:
         type: Mutation
         field: updateReminder
         request: updateReminder-request-mapping-template.vtl
-        response: update-response-mapping-template.vtl
+        response: single-object-response-mapping-template.vtl
 
     dataSources:
       - type: AMAZON_DYNAMODB
