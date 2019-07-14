@@ -1,17 +1,17 @@
 {
     "version" : "2017-02-28",
     "operation" : "PutItem",
+    #set( $now = $util.time.nowEpochSeconds() )
+    #set( $createdTimestamp = ${context.arguments.createdTimestamp} )
+    #if( $util.isNullOrBlank($createdTimestamp) )
+        #set( $createdTimestamp = $now )
+    #end
+
     "key": {
         "title" : { "S" : "${context.arguments.title}" },
-        "createdTimestamp" : { "N" : "${context.arguments.createdTimestamp}" }
+        "createdTimestamp" : { "N" : "$createdTimestamp" }
     },
-    "attributeValues" : {
-        "title"    : { "S" : "${context.arguments.title}" },
-        "createdTimestamp" : { "N" : ${context.arguments.createdTimestamp} },
-        "notes" : { "S" : "${context.arguments.notes}" },
-        "dueTimestamp" : { "N" : ${context.arguments.dueTimestamp} },
-        "location" : { "S" : "${context.arguments.location}" },
-        "remindTimestamp" : { "N" : ${context.arguments.remindTimestamp} },
-        "priority" : { "N" : ${context.arguments.priority} }
-    }
+    #set( $item = $context.arguments )
+    #set( $item.createdTimestamp = $createdTimestamp)
+    "attributeValues" : $util.dynamodb.toMapValuesJson($item)
 }
