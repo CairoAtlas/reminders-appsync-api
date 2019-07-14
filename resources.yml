@@ -1,0 +1,95 @@
+---
+Resources:
+  RemindersAppSyncDynamoDBServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: reminders-appsync-dynamo-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "appsync.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: reminders-appsync-dynamo-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "dynamodb:Query"
+                  - "dynamodb:BatchWriteItem"
+                  - "dynamodb:GetItem"
+                  - "dynamodb:DeleteItem"
+                  - "dynamodb:PutItem"
+                  - "dynamodb:Scan"
+                  - "dynamodb:UpdateItem"
+                Resource:
+                  Fn::GetAtt: [RemindersDynamoDBTable, Arn]
+  RemindersDynamoDBTable:
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: Retain
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: title
+          AttributeType: S
+        - AttributeName: createdTimestamp
+          AttributeType: N
+      KeySchema:
+        - AttributeName: title
+          KeyType: HASH
+        - AttributeName: createdTimestamp
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TableName: ${self:service}-${opt:stage}-table
+  RemindersS3Datalake:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ${self:service}-${opt:stage}-datalake
+  RemindersFirehoseRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ${self:service}-${opt:stage}-firehose-datalake-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "firehose.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: ${self:service}-${opt:stage}-firehose-datalake-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "s3:AbortMultipartUpload"
+                  - "s3:GetBucketLocation"
+                  - "s3:ListBucket"
+                  - "s3:ListBucketMultipartUploads"
+                  - "s3:PutObject"
+                Resource:
+                  - arn:aws:s3:::${self:service}-${opt:stage}-datalake
+                  - arn:aws:s3:::${self:service}-${opt:stage}-datalake/*
+  RemindersDatalakeFirehose:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    Properties:
+      DeliveryStreamName: ${self:service}-${opt:stage}-firehose-datalake
+      DeliveryStreamType: DirectPut
+      S3DestinationConfiguration:
+        BucketARN:
+          Fn::GetAtt: [RemindersS3Datalake, Arn]
+        BufferingHints:
+          IntervalInSeconds: 60
+          SizeInMBs: 1
+        CompressionFormat: GZIP
+        Prefix: reminders
+        RoleARN:
+          Fn::GetAtt: [RemindersFirehoseRole, Arn]
