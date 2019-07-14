@@ -1,4 +1,4 @@
-"""This lambda function adds workflowId and transaction times to the firehose record"""
+"""This lambda adds missing keys to the firehose record for reminder"""
 
 import base64
 import json
