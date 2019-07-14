@@ -58,32 +58,37 @@ Resources:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
-          - Effect: "Allow"
+          - Effect: Allow
             Principal:
               Service:
-                - "firehose.amazonaws.com"
-            Action: "sts:AssumeRole"
+                - firehose.amazonaws.com
+            Action: sts:AssumeRole
       Policies:
         - PolicyName: ${self:service}-${opt:stage}-firehose-datalake-policy
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
-              - Effect: "Allow"
+              - Effect: Allow
                 Action:
-                  - "s3:AbortMultipartUpload"
-                  - "s3:GetBucketLocation"
-                  - "s3:ListBucket"
-                  - "s3:ListBucketMultipartUploads"
-                  - "s3:PutObject"
+                  - s3:AbortMultipartUpload
+                  - s3:GetBucketLocation
+                  - s3:ListBucket
+                  - s3:ListBucketMultipartUploads
+                  - s3:PutObject
                 Resource:
                   - arn:aws:s3:::${self:service}-${opt:stage}-datalake
                   - arn:aws:s3:::${self:service}-${opt:stage}-datalake/*
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  Fn::GetAtt: [RemindersFirehoseTransformerLambdaFunction, Arn]
   RemindersDatalakeFirehose:
     Type: AWS::KinesisFirehose::DeliveryStream
     Properties:
       DeliveryStreamName: ${self:service}-${opt:stage}-firehose-datalake
       DeliveryStreamType: DirectPut
-      S3DestinationConfiguration:
+      ExtendedS3DestinationConfiguration:
         BucketARN:
           Fn::GetAtt: [RemindersS3Datalake, Arn]
         BufferingHints:
@@ -93,6 +98,14 @@ Resources:
         Prefix: reminders
         RoleARN:
           Fn::GetAtt: [RemindersFirehoseRole, Arn]
+        ProcessingConfiguration:
+          Enabled: True
+          Processors:
+            - Parameters:
+              - ParameterName: LambdaArn
+                ParameterValue:
+                  Fn::GetAtt: [RemindersFirehoseTransformerLambdaFunction, Arn]
+              Type: Lambda
   RemindersDynamoToFirehoseRole:
     Type: AWS::IAM::Role
     Properties:
