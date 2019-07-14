@@ -1,7 +1,7 @@
 type Query {
 	getReminder(
 		title: String!
-		createdTimestamp: Int
+		createdTimestamp: Int!
 	): Reminder!
 
 	getRemindersByTitle(
@@ -13,6 +13,16 @@ type Query {
 
 type Mutation {
 	createReminder(
+		title: String!
+		createdTimestamp: Int
+		notes: String
+		dueTimestamp: Int
+		location: String
+		remindTimestamp: Int
+		priority: Int
+	): Reminder!
+
+	updateReminder(
 		title: String!
 		createdTimestamp: Int!
 		notes: String
