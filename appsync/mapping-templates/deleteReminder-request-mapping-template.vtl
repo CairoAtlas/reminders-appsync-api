@@ -3,7 +3,6 @@
     "operation" : "DeleteItem",
     "key" : {
         "title" : { "S" : "${context.arguments.title}" },
-        "createdTimestamp" : { "S" : "${context.arguments.createdTimestamp}" }
-    },
-    "consistentRead" : true
+        "createdTimestamp" : { "N" : "${context.arguments.createdTimestamp}" }
+    }
 }

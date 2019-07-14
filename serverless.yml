@@ -34,7 +34,7 @@ custom:
         type: Mutation
         field: deleteReminder
         request: deleteReminder-request-mapping-template.vtl
-        response: passthrough-response-mapping-template.vtl
+        response: single-object-response-mapping-template.vtl
       - dataSource: Reminders
         type: Mutation
         field: createReminder
