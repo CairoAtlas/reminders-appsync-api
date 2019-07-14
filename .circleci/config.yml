@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: python:3.7-alpine3.8
+      - image: circleci/node:9.11.2
 
     working_directory: ~/repo
 
@@ -12,25 +12,7 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "requirements.txt" }}
             - v1-dependencies-
-
-      - run:
-          name: install dependencies
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install -r requirements.txt
-
-      - save_cache:
-          paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
-
-      - run:
-          name: install node and npm
-          command: |
-            apk add --update nodejs nodejs-npm
 
       - run:
           name: install serverless and plugins
@@ -39,12 +21,10 @@ jobs:
             npm install --save serverless-pseudo-parameters
             npm install --save serverless-appsync-plugin
 
-      - run:
-          name: configure aws
-          command: |
-            aws configure set aws_access_key_id ACCESS_KEY
-            aws configure set aws_secret_access_key SECRET_KEY
-            aws configure set region us-east-1
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-
 
       - run:
           name: deploy
