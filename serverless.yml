@@ -26,6 +26,11 @@ custom:
         request: getReminders-request-mapping-template.vtl
         response: passthrough-response-mapping-template.vtl
       - dataSource: Reminders
+        type: Query
+        field: getRemindersByTitle
+        request: getRemindersByTitle-request-mapping-template.vtl
+        response: passthrough-response-mapping-template.vtl
+      - dataSource: Reminders
         type: Mutation
         field: deleteReminder
         request: deleteReminder-request-mapping-template.vtl
@@ -34,6 +39,11 @@ custom:
         type: Mutation
         field: createReminder
         request: createReminder-request-mapping-template.vtl
+        response: passthrough-response-mapping-template.vtl
+      - dataSource: Reminders
+        type: Mutation
+        field: updateReminder
+        request: updateReminder-request-mapping-template.vtl
         response: passthrough-response-mapping-template.vtl
 
     dataSources:
