@@ -12,7 +12,7 @@ package:
     - .serverless/**
     - .circleci/**
     - node_modules/**
-    - test/**
+    - tests/**
     - .gitignore
     - package-lock.json
     - README.md
@@ -26,11 +26,17 @@ plugins:
 
 functions:
   RemindersDynamoToFirehose:
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt: [ RemindersDynamoDBTable, StreamArn ]
     handler: lambda_functions/reminders_dynamo_to_firehose.handler
     name: ${self:service}-${opt:stage}-RemindersDynamoToFirehose
     description: Log new, updated, and old dynamodb records to firehose to go to the datalake
     package:
-      include: lambda_functions/reminders_dynamo_to_firehose.py
+      include:
+        - lambda_functions/reminders_dynamo_to_firehose.py
 
     memorySize: 128
     timeout: 5
@@ -41,7 +47,8 @@ functions:
     handler: lambda_functions/reminders_firehose_transformer.handler
     description: Add missing keys to firehose record
     package:
-      include: lambda_functions/reminders_firehose_transformer.py
+      include:
+        - lambda_functions/reminders_firehose_transformer.py
 
     memorySize: 128
     timeout: 5

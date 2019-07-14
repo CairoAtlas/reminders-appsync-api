@@ -8,14 +8,6 @@ import os
 LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
 REMINDER_KEYS = os.environ['REMINDER_KEYS'].split(',')
-""" 'title',
-    'createdTimestamp',
-    'notes',
-    'dueTimestamp',
-    'location',
-    'remindTimestamp',
-    'priority'
-"""
 
 
 def handler(event, context):
