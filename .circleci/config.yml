@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: nikolaik/python3.7-nodejs10
+      - image: circleci/node:9.11.2
 
     working_directory: ~/repo
 
@@ -12,34 +12,34 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "requirements.txt" }}
+            - v1-dependencies-
               # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-      - run:
-          name: install dependencies
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install -r requirements.txt
-
-      - save_cache:
-          paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
-
-      - run:
-          name: run pylint
-          command: |
-            . venv/bin/activate
-            pylint lambda_functions/
-
-      - run:
-          name: run tests
-          command: |
-            . venv/bin/activate
-            cd lambda_functions
-            python -m pytest ../tests
-            cd ..
+      # - run:
+      #     name: install dependencies
+      #     command: |
+      #       python3 -m venv venv
+      #       . venv/bin/activate
+      #       pip install -r requirements.txt
+#
+      # - save_cache:
+      #     paths:
+      #       - ./venv
+      #     key: v1-dependencies-{{ checksum "requirements.txt" }}
+#
+      # - run:
+      #     name: run pylint
+      #     command: |
+      #       . venv/bin/activate
+      #       pylint lambda_functions/
+#
+      # - run:
+      #     name: run tests
+      #     command: |
+      #       . venv/bin/activate
+      #       cd lambda_functions
+      #       python -m pytest ../tests
+      #       cd ..
 
       - run:
           name: install serverless and plugins
